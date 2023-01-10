@@ -20,3 +20,22 @@ if __name__ == "__main__":
         ctx = cairo.Context(surface)
         ctx.scale(size/1000, size/1000)
         Logo_Cairo(ctx)
+
+    # Make a favicon with light gray background
+    size = 100
+    surface = cairo.SVGSurface(
+        "favicon.svg",
+        size,
+        size,
+    )
+    ctx = cairo.Context(surface)
+    ctx.save()
+    ctx.set_source_rgb(0.9, 0.9, 0.9)
+    ctx.paint()
+    ctx.fill()
+    ctx.restore()
+    ctx.scale(size/1000, size/1000)
+    Logo_Cairo(ctx)
+
+    
+    
