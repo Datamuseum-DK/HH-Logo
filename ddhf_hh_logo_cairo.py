@@ -4,38 +4,51 @@ import cairo
 
 from ddhf_hh_logo import DDHF_HH_Logo
 
-def Logo_Cairo(ctx):
+def Logo_Cairo(ctx, txt=None, txtsz=None, txtcol=None):
+    if txt:
+        ctx.save()
+        ctx.set_source_rgb(*txtcol)
+        ctx.set_font_size(txtsz)
+        ctx.select_font_face("Arial",
+                     cairo.FONT_SLANT_NORMAL,
+                     cairo.FONT_WEIGHT_NORMAL)
+        xbearing, ybearing, width, height, dx, dy = ctx.text_extents(txt)
+        ctx.move_to(500 - width/2, 500 + height/2)
+        ctx.show_text(txt)
+        ctx.restore()
     ctx.set_line_cap(cairo.LineCap.ROUND)
     ctx.set_line_join(cairo.LineCap.ROUND)
     DDHF_HH_Logo().logo_shapes(drawer=ctx)
     ctx.stroke()
 
+def Logo_TA_Cairo(ctx):
+    Logo_Cairo(ctx, txt="TA", txtsz=700, txtcol=(0,.3,1))
+    
+
 if __name__ == "__main__":
-    for size in (100, 1000,):
-        surface = cairo.SVGSurface(
-            "hh_logo_%d.svg" % size,
-            size,
-            size,
-        )
+    # The basic logos
+    for fn, func,size in (
+         ("hh_logo_100.svg", Logo_Cairo, 100),
+         ("hh_logo_1000.svg", Logo_Cairo, 1000),
+         ("hh_logo_ta_100.svg", Logo_TA_Cairo, 100),
+         ("hh_logo_ta_1000.svg", Logo_TA_Cairo, 1000),
+    ):
+        surface = cairo.SVGSurface(fn, size, size)
         ctx = cairo.Context(surface)
         ctx.scale(size/1000, size/1000)
-        Logo_Cairo(ctx)
+        func(ctx)
 
     # Make a favicon with light gray background
-    size = 100
-    surface = cairo.SVGSurface(
-        "favicon.svg",
-        size,
-        size,
-    )
-    ctx = cairo.Context(surface)
-    ctx.save()
-    ctx.set_source_rgb(0.9, 0.9, 0.9)
-    ctx.paint()
-    ctx.fill()
-    ctx.restore()
-    ctx.scale(size/1000, size/1000)
-    Logo_Cairo(ctx)
-
-    
-    
+    for fn, func,size in (
+         ("favicon.svg", Logo_Cairo, 100),
+         ("favicon_ta.svg", Logo_TA_Cairo, 100),
+    ):
+        surface = cairo.SVGSurface(fn, size, size)
+        ctx = cairo.Context(surface)
+        ctx.save()
+        ctx.set_source_rgb(0.9, 0.9, 0.9)
+        ctx.paint()
+        ctx.fill()
+        ctx.restore()
+        ctx.scale(size/1000, size/1000)
+        func(ctx)
